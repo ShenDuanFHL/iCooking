@@ -26,8 +26,11 @@ public class DBConnector {
 		return con;
 	}
 
+	
+	
 	/**
-	 * Retrieves results from the Database.
+	 * Retrieves all recipe results from the Database.
+	 * 
 	 */
 	public void retrieveResults() {
 		try {
@@ -48,56 +51,61 @@ public class DBConnector {
 		}
 	}
 
+	
+	
 	/**
 	 * Updates the name and servings.
+	 * 
 	 */
 	public void update() {
 		try {
 			Connection con = access();
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate("INSERT INTO recipe (name, servings) VALUES('Xiao Longbao',4)");
-
 			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
+	
+	
+	/**
+	 * Adds a recipe to database. Adds recipe information to recipe table;
+	 * preparation step list to preparation_step table; ingredient list to
+	 * ingredient table. Recipe ID is assigned automatically by the database.
+	 * 
+	 * @param r
+	 *            the recipe
+	 */
 	public void insert(Recipe r) {
 		try {
 			Connection con = access();
 			Statement stmt = con.createStatement();
-
 			stmt.executeUpdate("INSERT INTO recipe (name, servings, preparationTime, cookingTime) VALUES('"
 					+ r.getRecipeName() + "', " + r.getServings() + ", " + r.getCookingTime() + ", "
 					+ r.getPreparationTime() + ")");
-
 			ResultSet rset = stmt.executeQuery("select * from recipe order by recipe_id desc limit 1");
-
+			
 			if (rset.next()) {
 				r.setRecipeID(rset.getInt(1));
 			}
-
+			
 			ArrayList<String> prepStep = r.getPreparationStepList();
-
 			for (int i = 0; i < prepStep.size(); i++) {
 				stmt.executeUpdate("INSERT INTO preparation_step (recipe_id, step, description) VALUES ("
 						+ r.getRecipeID() + ", " + i + ", '" + prepStep.get(i) + "')");
 			}
 
-		
-
 			ArrayList<Ingredient> ingList = r.getIngredientList();
-
 			for (int i = 0; i < ingList.size(); i++) {
 				stmt.executeUpdate("INSERT INTO ingredient (recipe_id, name, quantity, unit, description) VALUES ("
 						+ r.getRecipeID() + ", '" + ingList.get(i).getIngredientName() + "', "
 						+ ingList.get(i).getIngredientAmount() + ", '" + ingList.get(i).getIngredientUnit() + "', '"
 						+ ingList.get(i).getIngredientDescription() + "')");
 			}
-			
-			con.close();
 
+			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
