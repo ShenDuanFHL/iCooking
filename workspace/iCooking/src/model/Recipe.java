@@ -1,7 +1,6 @@
 package model;
 
 import java.io.Serializable;
-import java.sql.*;
 import java.util.ArrayList;
 
 /**
@@ -14,24 +13,24 @@ import java.util.ArrayList;
  */
 class Recipe implements Serializable {
 
-	private long recipeID;
+	private int recipeID;
 	private String recipeName;
-	
+
 	// cuisine style of recipe
 	private String cuisine;
-	
+
 	// the number of servers
-	private double serving;
+	private double servings;
 	private String author;
-	
+
 	// special attribute of recipe
 	private Category category;
 	private int preparationTime;
 	private int cookingTime;
-	
+
 	// the list of ingredients needed for the recipe
 	private ArrayList<Ingredient> ingredientList = new ArrayList<Ingredient>();
-	
+
 	// the list of preparationsteps needed for the recipe
 	private ArrayList<String> preparationStepList = new ArrayList<String>();
 
@@ -39,15 +38,15 @@ class Recipe implements Serializable {
 	 * constructor of Recipe
 	 * 
 	 * @param name
-	 * @param location
+	 * @param cuisine
 	 *            the style of the dish
-	 * @param serverAmount
+	 * @param servings
 	 *            the number of servers
 	 */
-	public Recipe(String name, String location, double serverAmount) {
+	public Recipe(String name, String cuisine, double servings) {
 		this.recipeName = name;
-		this.cuisine = location;
-		this.serving = serverAmount;
+		this.cuisine = cuisine;
+		this.servings = servings;
 	}
 
 	/**
@@ -55,7 +54,7 @@ class Recipe implements Serializable {
 	 * 
 	 * @return recipeID
 	 */
-	public long getRecipeID() {
+	public int getRecipeID() {
 		return recipeID;
 	}
 
@@ -64,7 +63,7 @@ class Recipe implements Serializable {
 	 * 
 	 * @param recipeID
 	 */
-	public void setRecipeID(long recipeID) {
+	public void setRecipeID(int recipeID) {
 		this.recipeID = recipeID;
 	}
 
@@ -107,19 +106,19 @@ class Recipe implements Serializable {
 	/**
 	 * get the number of servers
 	 * 
-	 * @return serving
+	 * @return servings
 	 */
-	public double getServing() {
-		return serving;
+	public double getServings() {
+		return servings;
 	}
 
 	/**
 	 * set the number of servers
 	 * 
-	 * @param serverAmount
+	 * @param servings
 	 */
-	public void setServing(double serving) {
-		this.serving = serving;
+	public void setServings(double servings) {
+		this.servings = servings;
 	}
 
 	/**
@@ -248,10 +247,20 @@ class Recipe implements Serializable {
 		preparationStepList.add(preparationStep);
 	}
 
+	/**
+	 * add recipe and its content to database
+	 * 
+	 * @param dbconnector
+	 *            connector connecting database and java
+	 */
+	public void addtoDatabase(DBConnector dbconnector) {
+		dbconnector.insert(this);
+	}
+
 	@Override
 	public String toString() {
-		return "Recipe [recipeID=" + recipeID + ", recipeName=" + recipeName + ", cuisine=" + cuisine + ", serving="
-				+ serving + ", author=" + author + ", category=" + category + ", preparationTime=" + preparationTime
+		return "Recipe [recipeID=" + recipeID + ", recipeName=" + recipeName + ", cuisine=" + cuisine + ", servings="
+				+ servings + ", author=" + author + ", category=" + category + ", preparationTime=" + preparationTime
 				+ ", cookingTime=" + cookingTime + ", ingredientList=" + ingredientList + ", preparationStepList="
 				+ preparationStepList + "]";
 	}
