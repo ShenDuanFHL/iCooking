@@ -142,5 +142,13 @@ public class CookBookApp {
 		System.out.println();
 		System.out.println(recipe);
 		
+		//connect to db
+		DBConnector dbconnector = new DBConnector();
+		//write to db
+		recipe.addtoDatabase(dbconnector);
+		Recipe recipe_2 = cb.getRecipe("Suan La Fen");
+		recipe_2.addtoDatabase(dbconnector);
+		Recipe recipe_3 = cb.getRecipe("Hong Shao Rou");
+		recipe_3.addtoDatabase(dbconnector);
 	}
 }
