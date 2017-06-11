@@ -3,6 +3,8 @@ package model;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Cookbook Manager provides methods for user to get recipe by the name of
@@ -26,6 +28,7 @@ public class CookBook implements Serializable {
 										// after searching
 	private boolean filtered = false; // whether the recipeList is a result
 										// after filter
+	private TimeComparator tc = new TimeComparator();
 
 	/**
 	 * Constructor of cookbook with a specific name.
@@ -38,7 +41,6 @@ public class CookBook implements Serializable {
 		toDB = new DBConnector();
 	}
 
-	
 	/**
 	 * Gets the name of the cookbook.
 	 * 
@@ -95,7 +97,7 @@ public class CookBook implements Serializable {
 	}
 
 	/**
-	 * @return  whether the recipe results are from filter
+	 * @return whether the recipe results are from filter
 	 */
 	public boolean isFiltered() {
 		return filtered;
@@ -143,6 +145,7 @@ public class CookBook implements Serializable {
 			recipeList.clear();
 			recipeList.addAll(recipeResult_search);
 		}
+		resortByTime();
 		return recipeList;
 	}
 
@@ -163,23 +166,22 @@ public class CookBook implements Serializable {
 		recipeList.addAll(recipeResult_search);
 		recipeResult_search.clear();
 		recipeResult_search.addAll(temp);
+		resortByTime();
 		return recipeList;
 	}
-
 
 	public void edit(Recipe recipe) {
 
 	}
-  
+
 	public void delete(Recipe recipe) {
-		
+
 	}
-	
+
 	public void add(Recipe recipe) {
 		recipeList.add(recipe);
 	}
 
-	
 	/**
 	 * Filters by the given category for a list of recipes.
 	 * 
@@ -196,10 +198,10 @@ public class CookBook implements Serializable {
 			recipeList.clear();
 			recipeList.addAll(recipeResult_filter);
 		}
+		resortByTime();
 		return recipeList;
 	}
 
-	
 	/**
 	 * Recalculates the ingredient amounts, preparation time and cooking time of
 	 * the specific recipe, according to the request serving amount.
@@ -221,6 +223,46 @@ public class CookBook implements Serializable {
 		recipe.setPreparationTime((int) (tempPreparationTime * servings / temp));
 		recipe.setCookingTime((int) (tempCookingTime * servings / temp));
 
+	}
+
+	/**
+	 * This class provides a comparator to compare two recipes by their time
+	 * (preparation time + cooking time) in order to sort the recipe result
+	 * list.
+	 * 
+	 * @author Shen Duan
+	 *
+	 */
+	class TimeComparator implements Comparator<Recipe> {
+
+		/**
+		 * Compares its two arguments for order.
+		 * 
+		 * @param r1
+		 *            the first recipe to be compared
+		 * @param r2
+		 *            the second recipe to be compared
+		 * @return 1 or -1 as the time of the first recipe is greater than, or,
+		 *         equal to or less than the time of the second recipe
+		 */
+		public int compare(Recipe r1, Recipe r2) {
+
+			if ((r1.getPreparationTime() + r1.getCookingTime()) > (r2.getPreparationTime() + r2.getCookingTime())) {
+				return 1;
+			} else {
+				return -1;
+			}
+		}
+	}
+
+	/**
+	 * Resorts the recipe list by time (preparation time + cooking time) in
+	 * ascending order
+	 * 
+	 * @author Shen Duan
+	 */
+	public void resortByTime() {
+		Collections.sort(recipeList, tc);
 	}
 
 	/**
