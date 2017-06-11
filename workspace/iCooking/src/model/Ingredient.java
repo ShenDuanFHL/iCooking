@@ -12,44 +12,48 @@ import java.sql.*;
 class Ingredient implements Serializable {
 
 	private String ingredientName;
-	private double ingredientAmount;
+	private double ingredientQuantity;
 	private String ingredientDescription;
 	private String ingredientUnit;
-	private long ingredientID;
+	private int ingredientID;
 
 	/**
 	 * Creates an Ingredient object with its name, amount, and description.
 	 * 
 	 * @param name
 	 *            name of the ingredient
-	 * @param amount
-	 *            amount of the ingredient
+	 * @param quantity
+	 *            quantity of the ingredient
 	 * @param description
 	 *            description of the ingredient
 	 */
-	public Ingredient(String name, double amount, String description) {
+	public Ingredient(String name, double quantity, String unit) {
 		this.ingredientName = name;
-		this.ingredientAmount = amount;
-		this.ingredientDescription = description;
+		this.ingredientQuantity = quantity;
+		this.ingredientUnit = unit;
 	}
 
 	/**
-	 * Creates an Ingredient object with its name, amount, unit and description.
+	 * Creates an Ingredient object with its name, quantity, unit and description.
 	 * 
 	 * @param name
 	 *            name of the ingredient
-	 * @param amount
-	 *            amount of the ingredient
+	 * @param quantity
+	 *            quantity of the ingredient
 	 * @param unit
 	 *            unit of the ingredient
 	 * @param description
 	 *            description of the ingredient
 	 */
-	public Ingredient(String name, double amount, String unit, String description) {
+	public Ingredient(String name, double quantity, String unit, String description) {
 		this.ingredientName = name;
-		this.ingredientAmount = amount;
+		this.ingredientQuantity = quantity;
 		this.ingredientUnit = unit;
 		this.ingredientDescription = description;
+	}
+
+	public Ingredient() {
+		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -72,22 +76,22 @@ class Ingredient implements Serializable {
 	}
 
 	/**
-	 * Gets the amount of the ingredient.
+	 * Gets the quantity of the ingredient.
 	 * 
-	 * @return the amount of the ingredient
+	 * @return the quantity of the ingredient
 	 */
-	public double getIngredientAmount() {
-		return ingredientAmount;
+	public double getIngredientQuantity() {
+		return ingredientQuantity;
 	}
 
 	/**
-	 * Sets the amount of the ingredient.
+	 * Sets the quantity of the ingredient.
 	 * 
-	 * @param ingredientAmount
-	 *            the amount of the ingredient
+	 * @param ingredientQuantity
+	 *            the quantity of the ingredient
 	 */
-	public void setIngredientAmount(double ingredientAmount) {
-		this.ingredientAmount = ingredientAmount;
+	public void setIngredientAmount(double ingredientQuantity) {
+		this.ingredientQuantity = ingredientQuantity;
 	}
 
 	/**
@@ -143,13 +147,13 @@ class Ingredient implements Serializable {
 	 * @param ingredientID
 	 *            the ID of the ingredient
 	 */
-	public void setIngredientID(long ingredientID) {
+	public void setIngredientID(int ingredientID) {
 		this.ingredientID = ingredientID;
 	}
 
 	@Override
 	public String toString() {
-		return "Ingredient [name=" + ingredientName + ", amount=" + ingredientAmount + ", description="
+		return "Ingredient [name=" + ingredientName + ", quantity=" + ingredientQuantity + ", description="
 				+ ingredientDescription + ", unit=" + ingredientUnit + ", ingredientID=" + ingredientID + "]";
 	}
 

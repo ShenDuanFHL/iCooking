@@ -24,7 +24,7 @@ class Recipe implements Serializable {
 	private String author;
 
 	// special attribute of recipe
-	private Category category;
+	private int categoryID;
 	private int preparationTime;
 	private int cookingTime;
 
@@ -47,6 +47,10 @@ class Recipe implements Serializable {
 		this.recipeName = name;
 		this.cuisine = cuisine;
 		this.servings = servings;
+	}
+
+	public Recipe() {
+		
 	}
 
 	/**
@@ -144,8 +148,8 @@ class Recipe implements Serializable {
 	 * 
 	 * @return category
 	 */
-	public Category getCategory() {
-		return category;
+	public int getCategoryID() {
+		return categoryID;
 	}
 
 	/**
@@ -153,8 +157,8 @@ class Recipe implements Serializable {
 	 * 
 	 * @param category
 	 */
-	public void setCategory(Category category) {
-		this.category = category;
+	public void setCategory(int categoryID) {
+		this.categoryID = categoryID;
 	}
 
 	/**
@@ -176,7 +180,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * get time of preparating for the recipe
+	 * get time of preparation for the recipe
 	 * 
 	 * @return preparationTime
 	 */
@@ -185,7 +189,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set time of preparating for the recipe
+	 * set time of preparation for the recipe
 	 * 
 	 * @param preparationTime
 	 */
@@ -212,7 +216,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * get the list of preparationsteps
+	 * get the list of preparation steps
 	 * 
 	 * @return preparationStepList
 	 */
@@ -221,7 +225,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set the list of preparationsteps
+	 * set the list of preparation steps
 	 * 
 	 * @param preparationStepList
 	 */
@@ -247,20 +251,12 @@ class Recipe implements Serializable {
 		preparationStepList.add(preparationStep);
 	}
 
-	/**
-	 * add recipe and its content to database
-	 * 
-	 * @param dbconnector
-	 *            connector connecting database and java
-	 */
-	public void addtoDatabase(DBConnector dbconnector) {
-		dbconnector.insert(this);
-	}
+
 
 	@Override
 	public String toString() {
 		return "Recipe [recipeID=" + recipeID + ", recipeName=" + recipeName + ", cuisine=" + cuisine + ", servings="
-				+ servings + ", author=" + author + ", category=" + category + ", preparationTime=" + preparationTime
+				+ servings + ", author=" + author + ", categoryID=" + categoryID + ", preparationTime=" + preparationTime
 				+ ", cookingTime=" + cookingTime + ", ingredientList=" + ingredientList + ", preparationStepList="
 				+ preparationStepList + "]";
 	}

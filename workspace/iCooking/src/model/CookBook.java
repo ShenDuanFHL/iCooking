@@ -16,21 +16,31 @@ import java.util.ArrayList;
 
 public class CookBook implements Serializable {
 
-	private ArrayList<Recipe> recipeList = new ArrayList<Recipe>();
 	private String cookBookName = null;
+	DBConnector toDB;
+	private ArrayList<Recipe> recipeList = new ArrayList<Recipe>();
+	private ArrayList<Recipe> temp = new ArrayList<Recipe>();
+	private ArrayList<Recipe> recipeResult_search = new ArrayList<Recipe>();
+	private ArrayList<Recipe> recipeResult_filter = new ArrayList<Recipe>();
+	private boolean searched = false; // whether the recipeList is a result
+										// after searching
+	private boolean filtered = false; // whether the recipeList is a result
+										// after filter
 
 	/**
-	 * Constructor of cookbook containing the name of the cookbook
+	 * Constructor of cookbook with a specific name.
 	 * 
 	 * @param name
-	 *            the name of the cookbook
+	 *            the name of the cookbook to set
 	 */
 	public CookBook(String name) {
 		this.cookBookName = name;
+		toDB = new DBConnector();
 	}
 
+	
 	/**
-	 * Gets the name of the cookbook
+	 * Gets the name of the cookbook.
 	 * 
 	 * @return the name of the cookbook
 	 */
@@ -39,16 +49,7 @@ public class CookBook implements Serializable {
 	}
 
 	/**
-	 * Overrides toString method
-	 * 
-	 * @return new format of CookBook
-	 */
-	public String toString() {
-		return "CookBook [recipeList=" + recipeList + ", cookBookName=" + cookBookName + "]";
-	}
-
-	/**
-	 * Sets the name of the cookbook
+	 * Sets the name of the cookbook.
 	 * 
 	 * @param cookBookName
 	 *            name of the cookbook to set
@@ -58,7 +59,58 @@ public class CookBook implements Serializable {
 	}
 
 	/**
-	 * Searches the recipe(s) based on specific name
+	 * @return the recipe result list
+	 */
+	public ArrayList<Recipe> getRecipeList() {
+		return recipeList;
+	}
+
+	/**
+	 * @return the recipe result list from searching
+	 */
+	public ArrayList<Recipe> getRecipeResult_search() {
+		return recipeResult_search;
+	}
+
+	/**
+	 * @return the recipe result list from filter
+	 */
+	public ArrayList<Recipe> getRecipeResult_filter() {
+		return recipeResult_filter;
+	}
+
+	/**
+	 * @return whether the recipe results are from searching
+	 */
+	public boolean isSearched() {
+		return searched;
+	}
+
+	/**
+	 * @param searched
+	 *            whether recipe results are from searching to set
+	 */
+	public void setSearched(boolean searched) {
+		this.searched = searched;
+	}
+
+	/**
+	 * @return  whether the recipe results are from filter
+	 */
+	public boolean isFiltered() {
+		return filtered;
+	}
+
+	/**
+	 * @param filtered
+	 *            whether recipe results are from filter to set
+	 */
+	public void setFiltered(boolean filtered) {
+		this.filtered = filtered;
+	}
+
+	/**
+	 * Searches the recipe(s) based on a specific name.
 	 * 
 	 * @param name
 	 *            the name of the recipe to search
@@ -75,64 +127,108 @@ public class CookBook implements Serializable {
 	}
 
 	/**
-	 * Edits parts of the recipe
+	 * Searches for the recipes with keywords in recipe name or in ingredient
+	 * names.
 	 * 
-	 * @param recipe
-	 *            the recipe to be edited
+	 * @author Shen Duan
+	 * @param keywords
+	 *            the keywords used for searching
+	 * @return the list of corresponding recipes
 	 */
+	public ArrayList<Recipe> searchByKeyWords(String keywords) {
+		this.recipeResult_search = toDB.search(keywords);
+		if (filtered) {
+			intersact();
+		} else {
+			recipeList.clear();
+			recipeList.addAll(recipeResult_search);
+		}
+		return recipeList;
+	}
+
+	/**
+	 * Gets the intersection of a searched result and a filtered result without
+	 * changing the recipe result of searching and filter.
+	 * 
+	 * @author Shen Duan
+	 * @param recipeResult_search
+	 * @param recipeResult_filter
+	 * @return the final intersection of two lists
+	 */
+	public ArrayList<Recipe> intersact() {
+		recipeList.clear();
+		temp.clear();
+		temp.addAll(recipeResult_search);
+		recipeResult_search.retainAll(recipeResult_filter);
+		recipeList.addAll(recipeResult_search);
+		recipeResult_search.clear();
+		recipeResult_search.addAll(temp);
+		return recipeList;
+	}
+
+
 	public void edit(Recipe recipe) {
 
 	}
-
-	/**
-	 * Deletes specific recipe from database
-	 * 
-	 * @param recipe
-	 *            the recipe to be deleted
-	 */
+  
 	public void delete(Recipe recipe) {
-		recipeList.remove(recipe);
+		
 	}
-
-	/**
-	 * Adds new recipe to database
-	 * 
-	 * @param recipe
-	 *            the recipe to be added
-	 */
+	
 	public void add(Recipe recipe) {
 		recipeList.add(recipe);
 	}
 
+	
 	/**
-	 * Searches recipe(s) through filter
+	 * Filters by the given category for a list of recipes.
+	 * 
+	 * @author Shen Duan
+	 * @param category
+	 *            the category used for filter
+	 * @return the corresponding list of recipes
 	 */
-	public void filter() {
-		// get id through filter
-		// recipelist.get(ID);
+	public ArrayList<Recipe> filter(String category) {
+		this.recipeResult_filter = toDB.filter(category);
+		if (searched) {
+			intersact();
+		} else {
+			recipeList.clear();
+			recipeList.addAll(recipeResult_filter);
+		}
+		return recipeList;
 	}
 
+	
 	/**
 	 * Recalculates the ingredient amounts, preparation time and cooking time of
-	 * the specific recipe, according to the request serving amount
+	 * the specific recipe, according to the request serving amount.
 	 * 
 	 * @param recipe
 	 *            the chosen recipe
-	 * @param serving
+	 * @param servings
 	 *            the aim serve amount
 	 */
-	public void recalculateServings(String recipe, int serving) {
-		double temp = getRecipe(recipe).getServing();
-		getRecipe(recipe).setServing(serving);
-		int tempPreparationTime = getRecipe(recipe).getPreparationTime();
-		int tempCookingTime = getRecipe(recipe).getCookingTime();
-		for (int i = 0; i <= getRecipe(recipe).getIngredientList().size() - 1; i++) {
-			double tempAmount = getRecipe(recipe).getIngredientList().get(i).getIngredientAmount();
-			getRecipe(recipe).getIngredientList().get(i).setIngredientAmount(tempAmount * serving / temp);
+	public void recalculateServings(Recipe recipe, int servings) {
+		double temp = recipe.getServings();
+		recipe.setServings(servings);
+		int tempPreparationTime = recipe.getPreparationTime();
+		int tempCookingTime = recipe.getCookingTime();
+		for (int i = 0; i <= recipe.getIngredientList().size() - 1; i++) {
+			double tempAmount = recipe.getIngredientList().get(i).getIngredientQuantity();
+			recipe.getIngredientList().get(i).setIngredientAmount(tempAmount * servings / temp);
 		}
-		getRecipe(recipe).setPreparationTime((int) (tempPreparationTime * serving / temp));
-		getRecipe(recipe).setCookingTime((int) (tempCookingTime * serving / temp));
+		recipe.setPreparationTime((int) (tempPreparationTime * servings / temp));
+		recipe.setCookingTime((int) (tempCookingTime * servings / temp));
 
 	}
 
+	/**
+	 * Overrides toString method
+	 * 
+	 * @return new format of CookBook
+	 */
+	public String toString() {
+		return "CookBook [recipeList=" + recipeList + ", cookBookName=" + cookBookName + "]";
+	}
 }

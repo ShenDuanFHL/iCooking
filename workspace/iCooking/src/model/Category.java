@@ -17,6 +17,19 @@ class Category implements Serializable {
 	private String categoryName;
 	private String categoryDescription;
 
+	
+	
+	/**
+	 * Creates an Category with the specific.
+	 * 
+	 * @param name
+	 *            the name of the category
+	 */
+	public Category(int categoryID,String name) {
+		this.categoryID = categoryID;
+		this.categoryName = name;
+
+	}
 	/**
 	 * Creates an Category with the specific name and description.
 	 * 
@@ -92,4 +105,7 @@ class Category implements Serializable {
 				+ categoryDescription + "]";
 	}
 
+	
+
+	
 }

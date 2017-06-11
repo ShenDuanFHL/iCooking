@@ -138,17 +138,29 @@ public class CookBookApp {
 		} 
 		
 		//test
-		cb.recalculateServings(recipe.getRecipeName(), 10);
+		//cb.recalculateServings(recipe, 10);
 		System.out.println();
 		System.out.println(recipe);
 		
 		//connect to db
 		DBConnector dbconnector = new DBConnector();
 		//write to db
-		recipe.addtoDatabase(dbconnector);
-		Recipe recipe_2 = cb.getRecipe("Suan La Fen");
-		recipe_2.addtoDatabase(dbconnector);
-		Recipe recipe_3 = cb.getRecipe("Hong Shao Rou");
-		recipe_3.addtoDatabase(dbconnector);
+		
+	
+//		dbconnector.addRecipe(recipe);
+//		Recipe recipe_2 = cb.getRecipe("Suan La Fen");
+//		Recipe recipe_3 = cb.getRecipe("Hong Shao Rou");
+//		
+//		Category mainDish = new Category(1,"Main Dish");
+//		Category sideDish = new Category(2,"Side Dish");
+//		dbconnector.addCategory(mainDish);
+//		dbconnector.addCategory(sideDish);
+//		recipe_2.setCategory(1);
+//		recipe_3.setCategory(2);
+//		dbconnector.addRecipe(recipe_2);
+//		dbconnector.addRecipe(recipe_3);
+		
+		System.out.println("chicken: " + cb.searchByKeyWords("chicken"));
+		System.out.println("mainDish: " + cb.filter("Main Dish"));
 	}
 }
