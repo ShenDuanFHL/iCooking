@@ -21,55 +21,148 @@ public class DBConnector {
 	 *             if a database access error occurs or this method is called on
 	 *             a closed connection
 	 */
-	public Connection access() throws SQLException {
+	private Connection access() throws SQLException {
 		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cookbook", "root", "");
 		return con;
 	}
 
-	
-	
 	/**
-	 * Retrieves all recipe results from the Database.
+	 * Retrieves the recipe results in an Array List from the Database,
+	 * according to the recipe ID.
 	 * 
+	 * @param rset_rID
+	 *            the result set of recipe id
+	 * @return the corresponding list of recipe
 	 */
-	public void retrieveResults() {
+	public ArrayList<Recipe> retrieveRecipe(ArrayList<Integer> rIDList) {
+		ArrayList<Recipe> recipeList = null;
 		try {
 			Connection con = access();
-			Statement stmt = con.createStatement();
-			ResultSet rset = stmt.executeQuery("SELECT * FROM recipe;");
-			while (rset.next()) {
-				String recipeName = rset.getString("name");
-				int servingCount = rset.getInt("servings");
-				int prepTime = rset.getInt("preparationTime");
-				int cookingTime = rset.getInt("cookingTime");
-				System.out.println("recipe name: " + recipeName + ", servings: " + servingCount + ", preparation time: "
-						+ prepTime + ", cooking time: " + cookingTime);
+			Statement stmt1 = con.createStatement();
+			Statement stmt2 = con.createStatement();
+			Statement stmt3 = con.createStatement();
+			recipeList = new ArrayList<Recipe>();
+			for (int i = 0; i < rIDList.size(); i++) {
+				int rID = rIDList.get(i);
+
+				ResultSet rset = stmt1.executeQuery("SELECT * FROM recipe where recipe_id = " + rID + ";");
+				while (rset.next()) {
+					Recipe r = new Recipe();
+					r.setRecipeName(rset.getString("name"));
+					r.setRecipeID(rset.getInt("recipe_id"));
+					// r.setCuisine(rset.getString("cuisine"));
+					r.setServings(rset.getDouble("servings"));
+					// r.setAuthor(rset.getString("author"));
+					r.setPreparationTime(rset.getInt("preparationTime"));
+					r.setCookingTime(rset.getInt("cookingTime"));
+
+					ResultSet rset_ingredient = stmt2
+							.executeQuery("SELECT * FROM ingredient where recipe_id = " + rID + ";");
+					ArrayList<Ingredient> ingredientList = new ArrayList<Ingredient>();
+
+					while (rset_ingredient.next()) {
+						Ingredient ingr = new Ingredient();
+						ingr.setIngredientName(rset_ingredient.getString("name"));
+						ingr.setIngredientAmount(rset_ingredient.getDouble("quantity"));
+						ingr.setIngredientUnit(rset_ingredient.getString("unit"));
+						ingr.setIngredientDescription(rset_ingredient.getString("description"));
+						ingredientList.add(ingr);
+					}
+
+					ResultSet rset_prepStep = stmt3
+							.executeQuery("SELECT * FROM preparation_step where recipe_id = " + rID + ";");
+					ArrayList<String> prepStepList = new ArrayList<String>();
+
+					while (rset_prepStep.next()) {
+						prepStepList.add(rset_prepStep.getString("description"));
+					}
+
+					r.setIngredientList(ingredientList);
+					r.setPreparationStepList(prepStepList);
+
+					recipeList.add(r);
+				}
 			}
 			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return recipeList;
 	}
 
-	
-	
 	/**
-	 * Updates the name and servings.
+	 * Searches for the recipes whose recipe name or ingredient name contain the
+	 * given keywords.
 	 * 
+	 * @param keywords
+	 *            the keywords used for searching
+	 * @return the corresponding list of recipes
 	 */
-	public void update() {
+	public ArrayList<Recipe> search(String keywords) {
+		ArrayList<Recipe> recipeList = null;
 		try {
 			Connection con = access();
 			Statement stmt = con.createStatement();
-			stmt.executeUpdate("INSERT INTO recipe (name, servings) VALUES('Xiao Longbao',4)");
+			// get the corresponding recipe id
+			ResultSet rset_rID = stmt.executeQuery(
+					"SELECT distinct recipe.recipe_id from recipe, ingredient where recipe.recipe_id = ingredient.recipe_id and ( recipe.name LIKE'%"
+							+ keywords + "%' or ingredient.name LIKE '%" + keywords + "%')");
+			ArrayList<Integer> rID = new ArrayList<Integer>();
+			while (rset_rID.next()) {
+				rID.add(rset_rID.getInt(1));
+			}
+
+			recipeList = retrieveRecipe(rID);
 			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return recipeList;
 	}
 
-	
-	
+	/**
+	 * Filters the recipes according to the given category.
+	 * 
+	 * @param category
+	 *            the category used for filter
+	 * @return the corresponding recipe list
+	 */
+	public ArrayList<Recipe> filter(String category) {
+		ArrayList<Recipe> recipeList = null;
+		try {
+			Connection con = access();
+			Statement stmt = con.createStatement();
+			ResultSet rset_rID = stmt.executeQuery(
+					"SELECT recipe_id from recipe,category where recipe.category_id = category.category_id and category.name = '"
+							+ category + "';");
+			ArrayList<Integer> rID = new ArrayList<Integer>();
+			while (rset_rID.next()) {
+				rID.add(rset_rID.getInt(1));
+			}
+			recipeList = retrieveRecipe(rID);
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return recipeList;
+	}
+
+	// /**
+	// * Updates the name and servings.
+	// *
+	// */
+	// public void update() {
+	// try {
+	// Connection con = access();
+	// Statement stmt = con.createStatement();
+	// stmt.executeUpdate("INSERT INTO recipe (name, servings) VALUES('Xiao
+	// Longbao',4)");
+	// con.close();
+	// } catch (SQLException e) {
+	// e.printStackTrace();
+	// }
+	// }
+
 	/**
 	 * Adds a recipe to database. Adds recipe information to recipe table;
 	 * preparation step list to preparation_step table; ingredient list to
@@ -78,19 +171,20 @@ public class DBConnector {
 	 * @param r
 	 *            the recipe
 	 */
-	public void insert(Recipe r) {
+	public void addRecipe(Recipe r) {
 		try {
 			Connection con = access();
 			Statement stmt = con.createStatement();
-			stmt.executeUpdate("INSERT INTO recipe (name, servings, preparationTime, cookingTime) VALUES('"
+			stmt.executeUpdate("INSERT INTO recipe (name, servings, preparationTime, cookingTime,category_id) VALUES('"
 					+ r.getRecipeName() + "', " + r.getServings() + ", " + r.getCookingTime() + ", "
-					+ r.getPreparationTime() + ")");
+					+ r.getPreparationTime() + "," + r.getCategoryID() + ")");
+			// get the last added recipe
 			ResultSet rset = stmt.executeQuery("select * from recipe order by recipe_id desc limit 1");
-			
+
 			if (rset.next()) {
 				r.setRecipeID(rset.getInt(1));
 			}
-			
+
 			ArrayList<String> prepStep = r.getPreparationStepList();
 			for (int i = 0; i < prepStep.size(); i++) {
 				stmt.executeUpdate("INSERT INTO preparation_step (recipe_id, step, description) VALUES ("
@@ -101,10 +195,64 @@ public class DBConnector {
 			for (int i = 0; i < ingList.size(); i++) {
 				stmt.executeUpdate("INSERT INTO ingredient (recipe_id, name, quantity, unit, description) VALUES ("
 						+ r.getRecipeID() + ", '" + ingList.get(i).getIngredientName() + "', "
-						+ ingList.get(i).getIngredientAmount() + ", '" + ingList.get(i).getIngredientUnit() + "', '"
+						+ ingList.get(i).getIngredientQuantity() + ", '" + ingList.get(i).getIngredientUnit() + "', '"
 						+ ingList.get(i).getIngredientDescription() + "')");
 			}
 
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Adds a category to database.
+	 * 
+	 * @param c
+	 *            the category being added
+	 */
+	public void addCategory(Category c) {
+		try {
+			Connection con = access();
+			Statement stmt = con.createStatement();
+			stmt.executeUpdate("INSERT INTO category (category_id, name, description) VALUES(" + c.getCategoryID()
+					+ ", '" + c.getCategoryName() + "', '" + c.getCategoryDescription() + "'); ");
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Adds unit to database.
+	 * 
+	 * @param singular
+	 *            the singular form of the unit
+	 * @param plural
+	 *            the plural form of the unit
+	 */
+	public void addUnit(String singular, String plural) {
+		try {
+			Connection con = access();
+			Statement stmt = con.createStatement();
+			stmt.executeUpdate("INSERT INTO unit (singular, plural) VALUES('" + singular + "', '" + plural + "');");
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Adds an Ingredient to database.
+	 * 
+	 * @param name
+	 *            the name of the ingredient
+	 */
+	public void addIngredients(String name) {
+		try {
+			Connection con = access();
+			Statement stmt = con.createStatement();
+			stmt.executeUpdate("INSERT INTO ingredients (name) VALUES('" + name + "');");
 			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
