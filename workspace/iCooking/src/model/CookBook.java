@@ -10,7 +10,7 @@ import java.util.Comparator;
  * Cookbook Manager provides methods for user to get recipe by the name of
  * recipe, edit specific recipe, delete specific recipe, add new recipe.
  * 
- * @author Xu Chen
+ * @author Xu Chen, Shen Duan
  * 
  * @version 1.0
  *
@@ -112,20 +112,16 @@ public class CookBook implements Serializable {
 	}
 
 	/**
-	 * Searches the recipe(s) based on a specific name.
+	 * Gets the recipe by its name.
 	 * 
 	 * @param name
-	 *            the name of the recipe to search
-	 * @return the recipe of the name
+	 *            the name of the recipe
+	 * @return the recipe with the given name
 	 */
 	public Recipe getRecipe(String name) {
-		Recipe recipeResult = null;
-		for (int i = 0; i < recipeList.size(); i++) {
-			if (recipeList.get(i).getRecipeName().equals(name)) {
-				recipeResult = recipeList.get(i);
-			}
-		}
-		return recipeResult;
+		Recipe r = null;
+		r = toDB.getRecipe(name);
+		return r;
 	}
 
 	/**
@@ -171,15 +167,21 @@ public class CookBook implements Serializable {
 	}
 
 	public void edit(Recipe recipe) {
-
+		toDB.editRecipe(recipe);
 	}
 
+	/**
+	 * Deletes the recipe from the database.
+	 * 
+	 * @param recipe
+	 *            the recipe to be deleted
+	 */
 	public void delete(Recipe recipe) {
-
+		toDB.deleteRrecipe(recipe);
 	}
 
 	public void add(Recipe recipe) {
-		recipeList.add(recipe);
+		toDB.addRecipe(recipe);
 	}
 
 	/**
@@ -218,7 +220,7 @@ public class CookBook implements Serializable {
 		int tempCookingTime = recipe.getCookingTime();
 		for (int i = 0; i <= recipe.getIngredientList().size() - 1; i++) {
 			double tempAmount = recipe.getIngredientList().get(i).getIngredientQuantity();
-			recipe.getIngredientList().get(i).setIngredientAmount(tempAmount * servings / temp);
+			recipe.getIngredientList().get(i).setIngredientQuantity(tempAmount * servings / temp);
 		}
 		recipe.setPreparationTime((int) (tempPreparationTime * servings / temp));
 		recipe.setCookingTime((int) (tempCookingTime * servings / temp));
