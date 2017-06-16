@@ -306,8 +306,7 @@ public class DBConnector {
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate("UPDATE recipe SET name = '" + r.getRecipeName() + "', cuisine = '" + r.getCuisine()
 					+ "', servings = " + r.getServings() + ", preparationTime = " + r.getPreparationTime()
-					+ ", cookingTime = " + r.getCookingTime() + ", description = '" + r.getDescription()
-					+ "', category = '" + r.getCategory() + "', author = '" + r.getAuthor() + "' where recipe_id = "
+					+ ", cookingTime = " + r.getCookingTime() + ", category = '" + r.getCategory() + "', author = '" + r.getAuthor() + "' where recipe_id = "
 					+ r.getRecipeID() + ";");
 			deleteIngredientList(r);
 			ArrayList<Ingredient> ingList = new ArrayList<Ingredient>();
@@ -340,7 +339,7 @@ public class DBConnector {
 	 * @param r
 	 *            the recipe that is going to be deleted
 	 */
-	public void deleteRrecipe(Recipe r) {
+	public void deleteRecipe(Recipe r) {
 		try {
 			Connection con = access();
 			Statement stmt1 = con.createStatement();
