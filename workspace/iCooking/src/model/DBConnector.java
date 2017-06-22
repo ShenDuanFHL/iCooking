@@ -51,7 +51,7 @@ public class DBConnector {
 				r.setAuthor(rset1.getString("author"));
 				r.setPreparationTime(rset1.getInt("preparationTime"));
 				r.setCookingTime(rset1.getInt("cookingTime"));
-				r.setCategory(rset1.getString("category"));
+				r.setCategoryID(rset1.getInt("category_id"));
 			}
 			Statement stmt2 = con.createStatement();
 			ResultSet rset2 = stmt2.executeQuery("SELECT * from ingredient where recipe_id = " + recipe_id + ";");
@@ -104,7 +104,7 @@ public class DBConnector {
 					r.setCuisine(rset.getString("cuisine"));
 					r.setServings(rset.getDouble("servings"));
 					r.setAuthor(rset.getString("author"));
-					r.setCategory(rset.getString("category"));
+					r.setCategoryID(rset.getInt("category_id"));
 					r.setPreparationTime(rset.getInt("preparationTime"));
 					r.setCookingTime(rset.getInt("cookingTime"));
 
@@ -148,17 +148,26 @@ public class DBConnector {
 	 * 
 	 * @param keywords
 	 *            the keywords used for searching
+	 * @param filter
 	 * @return the corresponding list of recipes
 	 */
-	public ArrayList<Recipe> search(String keywords) {
+	public ArrayList<Recipe> search(String keywords, String filter) {
 		ArrayList<Recipe> recipeList = null;
 		try {
 			Connection con = access();
 			Statement stmt = con.createStatement();
 			// get the corresponding recipe id
-			ResultSet rset_rID = stmt.executeQuery(
-					"SELECT distinct recipe.recipe_id from recipe, ingredient where recipe.recipe_id = ingredient.recipe_id and ( recipe.name LIKE'%"
-							+ keywords + "%' or ingredient.name LIKE '%" + keywords + "%')");
+			ResultSet rset_rID;
+			if(filter == null){
+				rset_rID = stmt.executeQuery(
+						"SELECT distinct recipe.recipe_id from recipe, ingredient where recipe.recipe_id = ingredient.recipe_id and ( recipe.name LIKE'%"
+								+ keywords + "%' or ingredient.name LIKE '%" + keywords + "%')");
+			}else{
+				rset_rID = stmt.executeQuery(
+						"SELECT distinct recipe.recipe_id from recipe, ingredient, category where recipe.recipe_id = ingredient.recipe_id and ( recipe.name LIKE'%"
+								+ keywords + "%' or ingredient.name LIKE '%" + keywords + "%') and recipe.category_id = category.category_id and category.name = '" + filter +"';");
+			}
+			
 			ArrayList<Integer> rID = new ArrayList<Integer>();
 			while (rset_rID.next()) {
 				rID.add(rset_rID.getInt(1));
@@ -177,15 +186,23 @@ public class DBConnector {
 	 * 
 	 * @param category
 	 *            the category used for filter
+	 * @param filter
 	 * @return the corresponding recipe list
 	 */
-	public ArrayList<Recipe> filter(String category) {
+	public ArrayList<Recipe> filter(String keyWord, String filter) {
 		ArrayList<Recipe> recipeList = null;
 		try {
 			Connection con = access();
 			Statement stmt = con.createStatement();
-			ResultSet rset_rID = stmt
-					.executeQuery("SELECT recipe_id from recipe,category where recipe.category = '" + category + "';");
+			// get the corresponding recipe id
+			ResultSet rset_rID;
+			if(keyWord == null){
+				rset_rID= stmt.executeQuery("SELECT recipe_id from recipe,category where recipe.category_id = category.category_id and category.name = '" + filter + "';");
+			}else{
+				rset_rID = stmt.executeQuery("SELECT distinct recipe.recipe_id from recipe, ingredient, category where recipe.recipe_id = ingredient.recipe_id and ( recipe.name LIKE'%"
+						+ keyWord + "%' or ingredient.name LIKE '%" + keyWord + "%') and recipe.category_id = category.category_id and category.name = '" + filter +"';");
+			}
+			
 			ArrayList<Integer> rID = new ArrayList<Integer>();
 			while (rset_rID.next()) {
 				rID.add(rset_rID.getInt(1));
@@ -213,9 +230,9 @@ public class DBConnector {
 			Connection con = access();
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate(
-					"INSERT INTO recipe (name, servings, cuisine, preparationTime, cookingTime,category) VALUES('"
+					"INSERT INTO recipe (name, servings, cuisine, preparationTime, cookingTime,category_id) VALUES('"
 							+ r.getRecipeName() + "', " + r.getServings() + ", '" + r.getCuisine() + "',"
-							+ r.getCookingTime() + ", " + r.getPreparationTime() + ",'" + r.getCategory() + "')");
+							+ r.getCookingTime() + ", " + r.getPreparationTime() + "," + r.getCategoryID() + ")");
 			// get the last added recipe
 			ResultSet rset = stmt.executeQuery("select * from recipe order by recipe_id desc limit 1");
 
@@ -260,43 +277,23 @@ public class DBConnector {
 		}
 	}
 
-	// /**
-	// * Adds unit to database.
-	// *
-	// * @param singular
-	// * the singular form of the unit
-	// * @param plural
-	// * the plural form of the unit
-	// */
-	// public void addUnit(String singular, String plural) {
-	// try {
-	// Connection con = access();
-	// Statement stmt = con.createStatement();
-	// stmt.executeUpdate("INSERT INTO unit (singular, plural) VALUES('" +
-	// singular + "', '" + plural + "');");
-	// con.close();
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	//
-	// /**
-	// * Adds an Ingredient to database.
-	// *
-	// * @param name
-	// * the name of the ingredient
-	// */
-	// public void addIngredients(String name) {
-	// try {
-	// Connection con = access();
-	// Statement stmt = con.createStatement();
-	// stmt.executeUpdate("INSERT INTO ingredients (name) VALUES('" + name +
-	// "');");
-	// con.close();
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// }
-	// }
+	/**
+	 * Adds a unit to database.
+	 *
+	 * @param unit
+	 *            the singular form of the unit
+	 */
+	public void addUnit(String unit) {
+		try {
+			Connection con = access();
+			Statement stmt = con.createStatement();
+			stmt.executeUpdate("INSERT INTO unit (singular) VALUES('" + unit + "');");
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	public void editRecipe(Recipe r) {
 		try {
@@ -306,7 +303,7 @@ public class DBConnector {
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate("UPDATE recipe SET name = '" + r.getRecipeName() + "', cuisine = '" + r.getCuisine()
 					+ "', servings = " + r.getServings() + ", preparationTime = " + r.getPreparationTime()
-					+ ", cookingTime = " + r.getCookingTime() + ", category = '" + r.getCategory() + "', author = '" + r.getAuthor() + "' where recipe_id = "
+					+ ", cookingTime = " + r.getCookingTime() + ", category = " + r.getCategoryID() + ", author = '" + r.getAuthor() + "' where recipe_id = "
 					+ r.getRecipeID() + ";");
 			deleteIngredientList(r);
 			ArrayList<Ingredient> ingList = new ArrayList<Ingredient>();
