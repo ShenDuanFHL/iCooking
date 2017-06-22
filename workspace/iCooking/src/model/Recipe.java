@@ -25,8 +25,8 @@ public class Recipe implements Serializable {
 
 	// special attribute of recipe
 	private int category_id;
-	private int preparationTime;
-	private int cookingTime;
+	private double preparationTime;
+	private double cookingTime;
 
 	// the list of ingredients needed for the recipe
 	private ArrayList<Ingredient> ingredientList = new ArrayList<Ingredient>();
@@ -172,7 +172,7 @@ public class Recipe implements Serializable {
 	 * 
 	 * @return cookingTime
 	 */
-	public int getCookingTime() {
+	public double getCookingTime() {
 		return cookingTime;
 	}
 
@@ -190,7 +190,7 @@ public class Recipe implements Serializable {
 	 * 
 	 * @return preparationTime
 	 */
-	public int getPreparationTime() {
+	public double getPreparationTime() {
 		return preparationTime;
 	}
 

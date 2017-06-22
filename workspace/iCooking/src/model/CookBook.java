@@ -219,8 +219,8 @@ public class CookBook implements Serializable {
 	public void recalculateServings(Recipe r, double servings) {
 		double temp = r.getServings();
 		r.setServings(servings);
-		int tempPreparationTime = r.getPreparationTime();
-		int tempCookingTime = r.getCookingTime();
+		double tempPreparationTime = r.getPreparationTime();
+		double tempCookingTime = r.getCookingTime();
 		for (int i = 0; i <= r.getIngredientList().size() - 1; i++) {
 			double tempAmount = r.getIngredientList().get(i).getIngredientQuantity();
 			r.getIngredientList().get(i).setIngredientQuantity(tempAmount * servings / temp);
