@@ -291,5 +291,9 @@ public class CookBook implements Serializable {
 	public String toString() {
 		return "CookBook [recipeList=" + recipeList + ", cookBookName=" + cookBookName + "]";
 	}
+	
+	public boolean isRecipeNameUnique(Recipe r){
+		return toDB.isRnameUQ(r);
+	}
 
 }

@@ -385,4 +385,17 @@ public class DBConnector {
 		}
 	}
 
+	public boolean isRnameUQ(Recipe r) {
+		try {
+			Connection con = access();
+			Statement stmt1 = con.createStatement();
+			ResultSet rset1 = stmt1.executeQuery("Select name from recipe where name = '" + r.getRecipeName() + "';");
+			con.close();
+			return rset1.first();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 }
