@@ -19,15 +19,13 @@ import java.util.Comparator;
 public class CookBook implements Serializable {
 
 	private String cookBookName = null;
-	DBConnector toDB;
+	private DBConnector toDB;
 	private ArrayList<Recipe> recipeList = new ArrayList<Recipe>();
-	private ArrayList<Recipe> temp = new ArrayList<Recipe>();
-	private ArrayList<Recipe> recipeResult_search = new ArrayList<Recipe>();
-	private ArrayList<Recipe> recipeResult_filter = new ArrayList<Recipe>();
-	private boolean searched = false; // whether the recipeList is a result
-										// after searching
-	private boolean filtered = false; // whether the recipeList is a result
-										// after filter
+	// private ArrayList<Recipe> temp = new ArrayList<Recipe>();
+	// private ArrayList<Recipe> recipeResult_search = new ArrayList<Recipe>();
+	// private ArrayList<Recipe> recipeResult_filter = new ArrayList<Recipe>();
+	private String keyWord = null; // the keyword for searching
+	private String filterName = null; // the category id for filter
 	private TimeComparator tc = new TimeComparator();
 
 	/**
@@ -67,48 +65,62 @@ public class CookBook implements Serializable {
 		return recipeList;
 	}
 
+	// /**
+	// * @return the recipe result list from searching
+	// */
+	// public ArrayList<Recipe> getRecipeResult_search() {
+	// return recipeResult_search;
+	// }
+	//
+	// /**
+	// * @return the recipe result list from filter
+	// */
+	// public ArrayList<Recipe> getRecipeResult_filter() {
+	// return recipeResult_filter;
+	// }
+
 	/**
-	 * @return the recipe result list from searching
+	 * @return the keyWord
 	 */
-	public ArrayList<Recipe> getRecipeResult_search() {
-		return recipeResult_search;
+	public String getKeyWord() {
+		return keyWord;
 	}
 
 	/**
-	 * @return the recipe result list from filter
+	 * @param keyWord
+	 *            the keyWord
 	 */
-	public ArrayList<Recipe> getRecipeResult_filter() {
-		return recipeResult_filter;
+	public void setKeyWord(String keyWord) {
+		this.keyWord = keyWord;
 	}
 
 	/**
-	 * @return whether the recipe results are from searching
+	 * Sets the key word null.
 	 */
-	public boolean isSearched() {
-		return searched;
+	public void clearKeyWord() {
+		this.keyWord = null;
 	}
 
 	/**
-	 * @param searched
-	 *            whether recipe results are from searching to set
+	 * @return the name of the filter
 	 */
-	public void setSearched(boolean searched) {
-		this.searched = searched;
+	public String getFilterName() {
+		return filterName;
 	}
 
 	/**
-	 * @return whether the recipe results are from filter
+	 * @param filterName
+	 *            the name of the filter
 	 */
-	public boolean isFiltered() {
-		return filtered;
+	public void setFilterName(String filter) {
+		this.filterName = filter;
 	}
 
 	/**
-	 * @param filtered
-	 *            whether recipe results are from filter to set
+	 * Sets the filter name to null.
 	 */
-	public void setFiltered(boolean filtered) {
-		this.filtered = filtered;
+	public void clearFilterName() {
+		this.filterName = null;
 	}
 
 	/**
@@ -126,45 +138,41 @@ public class CookBook implements Serializable {
 
 	/**
 	 * Searches for the recipes with keywords in recipe name or in ingredient
-	 * names.
+	 * and the last filter. names.
 	 * 
 	 * @author Shen Duan
-	 * @param keywords
+	 * @param keyWord
 	 *            the keywords used for searching
 	 * @return the list of corresponding recipes
 	 */
-	public ArrayList<Recipe> searchByKeyWords(String keywords) {
-		this.recipeResult_search = toDB.search(keywords);
-		if (filtered) {
-			intersact();
-		} else {
-			recipeList.clear();
-			recipeList.addAll(recipeResult_search);
-		}
+	public ArrayList<Recipe> searchByKeyWords(String keyWord) {
+		setKeyWord(keyWord);
+		this.recipeList = toDB.search(keyWord, filterName);
 		resortByTime();
 		return recipeList;
 	}
 
-	/**
-	 * Gets the intersection of a searched result and a filtered result without
-	 * changing the recipe result of searching and filter.
-	 * 
-	 * @author Shen Duan
-	 * @param recipeResult_search
-	 * @param recipeResult_filter
-	 * @return the final intersection of two lists
-	 */
-	public ArrayList<Recipe> intersact() {
-		recipeList.clear();
-		temp.clear();
-		temp.addAll(recipeResult_search);
-		recipeResult_search.retainAll(recipeResult_filter);
-		recipeList.addAll(recipeResult_search);
-		recipeResult_search.clear();
-		recipeResult_search.addAll(temp);
-		resortByTime();
-		return recipeList;
-	}
+	// /**
+	// * Gets the intersection of a searched result and a filtered result
+	// without
+	// * changing the recipe result of searching and filter.
+	// *
+	// * @author Shen Duan
+	// * @param recipeResult_search
+	// * @param recipeResult_filter
+	// * @return the final intersection of two lists
+	// */
+	// public ArrayList<Recipe> intersact() {
+	// recipeList.clear();
+	// temp.clear();
+	// temp.addAll(recipeList);
+	// recipeList.retainAll(recipeResult_filter);
+	// recipeList.addAll(recipeList);
+	// recipeList.clear();
+	// recipeList.addAll(temp);
+	// //resortByTime();
+	// return recipeList;
+	// }
 
 	public void edit(Recipe recipe) {
 		toDB.editRecipe(recipe);
@@ -177,7 +185,7 @@ public class CookBook implements Serializable {
 	 *            the recipe to be deleted
 	 */
 	public void delete(Recipe recipe) {
-		toDB.deleteRrecipe(recipe);
+		toDB.deleteRecipe(recipe);
 	}
 
 	public void add(Recipe recipe) {
@@ -192,14 +200,9 @@ public class CookBook implements Serializable {
 	 *            the category used for filter
 	 * @return the corresponding list of recipes
 	 */
-	public ArrayList<Recipe> filter(String category) {
-		this.recipeResult_filter = toDB.filter(category);
-		if (searched) {
-			intersact();
-		} else {
-			recipeList.clear();
-			recipeList.addAll(recipeResult_filter);
-		}
+	public ArrayList<Recipe> filter(String filterName) {
+		setFilterName(filterName);
+		this.recipeList = toDB.filter(keyWord, filterName);
 		resortByTime();
 		return recipeList;
 	}
@@ -208,22 +211,22 @@ public class CookBook implements Serializable {
 	 * Recalculates the ingredient amounts, preparation time and cooking time of
 	 * the specific recipe, according to the request serving amount.
 	 * 
-	 * @param recipe
+	 * @param r
 	 *            the chosen recipe
 	 * @param servings
-	 *            the aim serve amount
+	 *            the aim serving amount
 	 */
-	public void recalculateServings(Recipe recipe, int servings) {
-		double temp = recipe.getServings();
-		recipe.setServings(servings);
-		int tempPreparationTime = recipe.getPreparationTime();
-		int tempCookingTime = recipe.getCookingTime();
-		for (int i = 0; i <= recipe.getIngredientList().size() - 1; i++) {
-			double tempAmount = recipe.getIngredientList().get(i).getIngredientQuantity();
-			recipe.getIngredientList().get(i).setIngredientQuantity(tempAmount * servings / temp);
+	public void recalculateServings(Recipe r, double servings) {
+		double temp = r.getServings();
+		r.setServings(servings);
+		int tempPreparationTime = r.getPreparationTime();
+		int tempCookingTime = r.getCookingTime();
+		for (int i = 0; i <= r.getIngredientList().size() - 1; i++) {
+			double tempAmount = r.getIngredientList().get(i).getIngredientQuantity();
+			r.getIngredientList().get(i).setIngredientQuantity(tempAmount * servings / temp);
 		}
-		recipe.setPreparationTime((int) (tempPreparationTime * servings / temp));
-		recipe.setCookingTime((int) (tempCookingTime * servings / temp));
+		r.setPreparationTime((int) (tempPreparationTime * servings / temp));
+		r.setCookingTime((int) (tempCookingTime * servings / temp));
 
 	}
 
@@ -268,6 +271,19 @@ public class CookBook implements Serializable {
 	}
 
 	/**
+	 * Add a category to database.
+	 * @param c
+	 * the category to be added
+	 */
+	public void addCategory(Category c){
+		toDB.addCategory(c);
+	}
+	
+	
+	public void addUnit(String unit){
+		toDB.addUnit(unit);
+	}
+	/**
 	 * Overrides toString method
 	 * 
 	 * @return new format of CookBook
@@ -275,4 +291,5 @@ public class CookBook implements Serializable {
 	public String toString() {
 		return "CookBook [recipeList=" + recipeList + ", cookBookName=" + cookBookName + "]";
 	}
+
 }

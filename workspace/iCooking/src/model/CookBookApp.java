@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 
 /**
  * A class for the program entry point and some test recipes.
@@ -137,30 +138,47 @@ public class CookBookApp {
 			System.out.println(recipe);
 		} 
 		
-		//test
-		//cb.recalculateServings(recipe, 10);
-		System.out.println();
-		System.out.println(recipe);
+		//test		
+		Recipe recipe_2 = cb.getRecipe("Suan La Fen");
+		Recipe recipe_3 = cb.getRecipe("Hong Shao Rou");
 		
-		//connect to db
-		DBConnector dbconnector = new DBConnector();
-		//write to db
+		//add Category
+		Category mainDish = new Category(1,"Main Dish");
+		Category sideDish = new Category(2,"Side Dish");
+		Category soup = new Category(3,"Soup");
+		Category dessert = new Category(4,"Dessert");
+
+		cb.addCategory(mainDish);
+		cb.addCategory(sideDish);
+		cb.addCategory(soup);
+		cb.addCategory(dessert);
 		
-	
-//		dbconnector.addRecipe(recipe);
-//		Recipe recipe_2 = cb.getRecipe("Suan La Fen");
-//		Recipe recipe_3 = cb.getRecipe("Hong Shao Rou");
-//		
-//		Category mainDish = new Category(1,"Main Dish");
-//		Category sideDish = new Category(2,"Side Dish");
-//		dbconnector.addCategory(mainDish);
-//		dbconnector.addCategory(sideDish);
-//		recipe_2.setCategory(1);
-//		recipe_3.setCategory(2);
-//		dbconnector.addRecipe(recipe_2);
-//		dbconnector.addRecipe(recipe_3);
+		recipe.setCategoryID(3);
+		recipe_2.setCategoryID(1);
+		recipe_3.setCategoryID(2);
+		// add recipe
+		cb.add(recipe);
+		cb.add(recipe_2);
+		cb.add(recipe_3);
 		
+		//search and filter:
+		cb.clearFilterName();
+		cb.clearKeyWord();
 		System.out.println("chicken: " + cb.searchByKeyWords("chicken"));
-		System.out.println("mainDish: " + cb.filter("Main Dish"));
+		
+		System.out.println("sideDish: " + cb.filter("Side Dish"));
+		
+		
+//		cb.addUnit("teaspoon");
+//		cb.addUnit("kg");
+//		cb.addUnit("piece");
+//		cb.addUnit("g");
+//		cb.addUnit("clove");
+//		cb.addUnit("cup");
+//		cb.addUnit("bunch");
+		
+		//cb.delete(recipe);
+		
+
 	}
 }
