@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * @version 1.0
  */
-class Recipe implements Serializable {
+public class Recipe implements Serializable {
 
 	private int recipeID;
 	private String recipeName;
@@ -24,24 +24,25 @@ class Recipe implements Serializable {
 	private String author;
 
 	// special attribute of recipe
-	private int categoryID;
+	private int category_id;
 	private int preparationTime;
 	private int cookingTime;
 
 	// the list of ingredients needed for the recipe
 	private ArrayList<Ingredient> ingredientList = new ArrayList<Ingredient>();
 
-	// the list of preparationsteps needed for the recipe
+	// the list of preparation steps needed for the recipe
 	private ArrayList<String> preparationStepList = new ArrayList<String>();
 
 	/**
-	 * constructor of Recipe
+	 * Creates a Recipe object with its name, cuisine and servings. 
 	 * 
 	 * @param name
+	 * the name of the recipe
 	 * @param cuisine
-	 *            the style of the dish
+	 *            the cuisine of the dish
 	 * @param servings
-	 *            the number of servers
+	 *            how many people does the recipe serve
 	 */
 	public Recipe(String name, String cuisine, double servings) {
 		this.recipeName = name;
@@ -49,30 +50,35 @@ class Recipe implements Serializable {
 		this.servings = servings;
 	}
 
+	/**
+	 * Default constructor
+	 */
 	public Recipe() {
 		
 	}
 
 	/**
-	 * get ID of recipe
+	 * Gets the ID of the recipe.
 	 * 
 	 * @return recipeID
 	 */
 	public int getRecipeID() {
 		return recipeID;
 	}
-
+	
 	/**
-	 * set ID of recipe
-	 * 
-	 * @param recipeID
+	 * Sets the ID of the recipe.
+	 * @param id
+	 * the ID of the recipe
 	 */
-	public void setRecipeID(int recipeID) {
-		this.recipeID = recipeID;
+	public void setRecipeID(int id) {
+		this.recipeID = id;
+		
 	}
 
+
 	/**
-	 * get name of recipe
+	 * Gets the name of the recipe.
 	 * 
 	 * @return recipeName
 	 */
@@ -81,16 +87,16 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set name of recipe
+	 * Sets the name of the recipe.
 	 * 
-	 * @param recipeName
+	 * @param name
 	 */
-	public void setRecipeName(String recipeName) {
-		this.recipeName = recipeName;
+	public void setRecipeName(String name) {
+		this.recipeName = name;
 	}
 
 	/**
-	 * get cuisine style of recipe
+	 * Gets the cuisine of the recipe.
 	 * 
 	 * @return cuisine
 	 */
@@ -99,7 +105,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set cuisine style of recipe
+	 * Sets the cuisine of the recipe.
 	 * 
 	 * @param cuisine
 	 */
@@ -108,7 +114,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * get the number of servers
+	 * Gets the servings of the recipe.
 	 * 
 	 * @return servings
 	 */
@@ -117,7 +123,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set the number of servers
+	 * Sets the servings of the recipe.
 	 * 
 	 * @param servings
 	 */
@@ -126,7 +132,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * get the author of recipe
+	 * Gets the author of recipe.
 	 * 
 	 * @return author
 	 */
@@ -135,7 +141,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set the author of recipe
+	 *Sets the author of recipe.
 	 * 
 	 * @param author
 	 */
@@ -144,25 +150,25 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * get the category of recipe
+	 * Gets the category of recipe.
 	 * 
 	 * @return category
 	 */
 	public int getCategoryID() {
-		return categoryID;
+		return category_id;
 	}
 
 	/**
-	 * set the category of recipe
+	 * Sets the category of recipe.
 	 * 
 	 * @param category
 	 */
-	public void setCategory(int categoryID) {
-		this.categoryID = categoryID;
+	public void setCategoryID(int category) {
+		this.category_id = category;
 	}
 
 	/**
-	 * get time of cooking
+	 * Gets the cooking time of the recipe
 	 * 
 	 * @return cookingTime
 	 */
@@ -171,7 +177,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set time of cooking
+	 * Sets the cooking time of the recipe
 	 * 
 	 * @param time
 	 */
@@ -180,7 +186,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * get time of preparation for the recipe
+	 * Gets the preparation time of the recipe.
 	 * 
 	 * @return preparationTime
 	 */
@@ -189,16 +195,16 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set time of preparation for the recipe
+	 * Sets the preparation time of the recipe
 	 * 
-	 * @param preparationTime
+	 * @param time
 	 */
-	public void setPreparationTime(int preparationTime) {
-		this.preparationTime = preparationTime;
+	public void setPreparationTime(int time) {
+		this.preparationTime = time;
 	}
 
 	/**
-	 * get the list of ingredients
+	 * Gets the list of ingredients.
 	 * 
 	 * @return ingredientList
 	 */
@@ -207,7 +213,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set the list of ingredients
+	 * Sets the list of ingredients.
 	 * 
 	 * @param ingredientList
 	 */
@@ -216,7 +222,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * get the list of preparation steps
+	 * Gets the list of preparation steps.
 	 * 
 	 * @return preparationStepList
 	 */
@@ -225,7 +231,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * set the list of preparation steps
+	 * Sets the list of preparation steps.
 	 * 
 	 * @param preparationStepList
 	 */
@@ -234,7 +240,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * add ingredients into ingredientList
+	 * Adds ingredients into ingredientList
 	 * 
 	 * @param ingredient
 	 */
@@ -243,7 +249,7 @@ class Recipe implements Serializable {
 	}
 
 	/**
-	 * add preparation step into preparationstepList
+	 * Adds preparation step into preparationstepList
 	 * 
 	 * @param preparationStep
 	 */
@@ -251,14 +257,14 @@ class Recipe implements Serializable {
 		preparationStepList.add(preparationStep);
 	}
 
-
-
 	@Override
 	public String toString() {
 		return "Recipe [recipeID=" + recipeID + ", recipeName=" + recipeName + ", cuisine=" + cuisine + ", servings="
-				+ servings + ", author=" + author + ", categoryID=" + categoryID + ", preparationTime=" + preparationTime
+				+ servings + ", author=" + author + ", category_id=" + category_id + ", preparationTime=" + preparationTime
 				+ ", cookingTime=" + cookingTime + ", ingredientList=" + ingredientList + ", preparationStepList="
 				+ preparationStepList + "]";
 	}
+
+
 
 }
